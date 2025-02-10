@@ -4,7 +4,7 @@
 import json
 import sys
 import hashlib
-from hash_to_field import XMDExpander, XOFExpander
+from hash_to_field import XMDExpander, XOFExpander, hash_to_field
 if sys.version_info[0] == 3:
     _as_bytes = lambda x: x if isinstance(x, bytes) else bytes(x, "utf-8")
 else:
@@ -171,6 +171,50 @@ ALL_EXPANDERS = [
     XOFExpander(test_dst("expander-SHAKE128-long-DST", 256), hashlib.shake_128, 128),
 ]
 
+def hash_to_field_expanderSHA256_128_fp(msg, count):
+    P = 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab
+    expander = XMDExpander(test_dst("expander-SHA256-128"), hashlib.sha256, 128)
+    u = hash_to_field(msg, count, P, 1, 64, expander)
+    return {
+        "msg": str(msg),
+        "u": [hex(x[0]).replace('0x','').zfill(64) for x in u],
+    }
+
+ALL_HASH_TO_FIELD = [
+    hash_to_field_expanderSHA256_128_fp,
+]
+
+def hash_to_field_to_json_file(h2f_fn, path="vectors"):
+    name = h2f_fn.__name__
+    with open(path + "/" + name + ".json", 'wt') as f:
+        vector = {}
+        vector["name"] = name
+        vector["tests"] = []
+        for msg in INPUTS:
+            for count in [1, 2]:
+                test = h2f_fn(msg, count)
+                vector["tests"].append(test)
+        json.dump(vector, f, sort_keys=True, indent=2)
+        f.write("\n")
+
+def hash_to_field_to_ascii_file(h2f_fn, path="ascii"):
+    name = h2f_fn.__name__
+    with open(path + "/" + name + ".txt", 'wt') as f:
+        f.write(Printer.tv.text("name", name) + "\n")
+        f.write("\n")
+        for msg in INPUTS:
+            for count in [1, 2]:
+                result = h2f_fn(msg, count)
+                f.write(Printer.tv.text("msg", result["msg"]) + "\n")
+                f.write(Printer.tv.text("u", str(result["u"])) + "\n")
+                f.write("\n")
+
+def create_hash_to_field_files(h2f_fn):
+    print("Generating: " + h2f_fn.__name__)
+    hash_to_field_to_ascii_file(h2f_fn)
+    hash_to_field_to_json_file(h2f_fn)
+
 if __name__ == '__main__':
     list(map(lambda s: create_suite_files(s), ALL_SUITES))
     list(map(lambda e: create_expander_files(e), ALL_EXPANDERS))
+    list(map(lambda h: create_hash_to_field_files(h), ALL_HASH_TO_FIELD))
