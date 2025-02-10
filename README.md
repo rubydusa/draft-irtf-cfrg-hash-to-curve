@@ -1,3 +1,7 @@
+> :warning: **Test vectors for hash_to_field were added in a scuffed way in commit 664b135**
+> 
+> These test vectors are not part of the RFC specification and were added for testing purposes only.
+
 # Hashing to Elliptic Curves
 
 This is the working area for the individual Internet-Draft, "Hashing to Elliptic Curves".
