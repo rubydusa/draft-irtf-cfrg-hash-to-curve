@@ -175,9 +175,10 @@ def hash_to_field_expanderSHA256_128_fp(msg, count):
     P = 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab
     expander = XMDExpander(test_dst("expander-SHA256-128"), hashlib.sha256, 128)
     u = hash_to_field(msg, count, P, 1, 64, expander)
+    u_hex = [hex(x[0]).replace('0x','') for x in u]
     return {
         "msg": str(msg),
-        "u": [hex(x[0]).replace('0x','').zfill(64) for x in u],
+        "u": ['0' + u_hex[i] if len(u_hex[i]) % 2 else u_hex[i] for i in range(len(u_hex))],
     }
 
 ALL_HASH_TO_FIELD = [
