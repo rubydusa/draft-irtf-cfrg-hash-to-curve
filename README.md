@@ -1,4 +1,4 @@
-> :warning: **Test vectors for hash_to_field were added in a scuffed way in commit 664b135**
+> :warning: **Test vectors for hash_to_field were added in a scuffed way in commits 664b135, f78f9b75**
 > 
 > These test vectors are not part of the RFC specification and were added for testing purposes only.
 
